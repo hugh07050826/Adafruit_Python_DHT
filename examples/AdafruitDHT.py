@@ -37,29 +37,16 @@ def post_to_mcs(payload):
 			conn = http.HTTPConnection("api.mediatek.com:80")
 			conn.connect() 
 			not_connected = 0 
-		except (http.HTTPException, socket.error) as ex: 
-			print ("Error: %s" % ex)
- 			time.sleep(10)
-			 # sleep 10 seconds 
+			except (http.HTTPException, socket.error) as ex: 
+				print ("Error: %s" % ex)
+				time.sleep(10)
+			 	# sleep 10 seconds 
 	conn.request("POST", "/mcs/v2/devices/" + deviceId + "/datapoints", json.dumps(payload), headers) 
 	response = conn.getresponse() 
 	print( response.status, response.reason, json.dumps(payload), time.strftime("%c")) 
 	data = response.read() 
 	conn.close() 
-  while true:
-    h0, t0= Adafruit_DHT.read_retry(sensor, pin)
-    if h0 is not None and t0 is not None:
-      print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(t0, h0))
-
-	    payload = {"datapoints":[{"dataChnId":"Humidity","values":{"value":h0}},
-      {"dataChnId":"Temperature","values":{"value":t0}}]} 
-      post_to_mcs(payload)
-      time.sleep(10) 
-
-    else:
-      print('Failed to get reading. Try again!')
-      sys.exit(1)
-
+	
 # Parse command line parameters.
 sensor_args = { '11': Adafruit_DHT.DHT11,
                 '22': Adafruit_DHT.DHT22,
@@ -71,13 +58,8 @@ else:
     print('Usage: sudo ./Adafruit_DHT.py [11|22|2302] <GPIO pin number>')
     print('Example: sudo ./Adafruit_DHT.py 2302 4 - Read from an AM2302 connected to GPIO pin #4')
     sys.exit(1)
-while true:
-  h0, t0 = Adafruit_DHT.read_retry(sensor, pin)
-  if h0 is not None and t0 is not None:
-    print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(t0, h0))
-  else:
-  print('Failed to get reading. Try again!')
-  sys.exit(1)
+
+
 
 
 # Try to grab a sensor reading.  Use the read_retry method which will retry up
@@ -96,3 +78,16 @@ if humidity is not None and temperature is not None:
 else:
     print('Failed to get reading. Try again!')
     sys.exit(1)
+while true:
+	h0, t0= Adafruit_DHT.read_retry(sensor, pin)
+	if h0 is not None and t0 is not None:
+		print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(t0, h0))
+
+		payload = {"datapoints":[{"dataChnId":"Humidity","values":{"value":h0}},
+			{"dataChnId":"Temperature","values":{"value":t0}}]} 
+	post_to_mcs(payload)
+	time.sleep(10) 
+
+	else:
+		print('Failed to get reading. Try again!')
+		sys.exit(1)
